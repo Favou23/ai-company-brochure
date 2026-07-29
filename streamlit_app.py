@@ -24,27 +24,27 @@ This application:
 
 st.divider()
 
-# company_name = st.text_input(
-#     "Company Name",
-#     placeholder="e.g. Hugging Face"
-# )
-
-# website = st.text_input(
-#     "Website URL",
-#     placeholder="https://huggingface.co"
-# )
-
 company_name = st.text_input(
     "Company Name",
-    value="Hugging Face",
-    help="Enter the company's name."
+    placeholder="e.g. Hugging Face"
 )
 
 website = st.text_input(
     "Website URL",
-    value="https://huggingface.co",
-    help="Enter the company's homepage URL."
+    placeholder="https://huggingface.co"
 )
+
+# company_name = st.text_input(
+#     "Company Name",
+#     value="Hugging Face",
+#     help="Enter the company's name."
+# )
+
+# website = st.text_input(
+#     "Website URL",
+#     value="https://huggingface.co",
+#     help="Enter the company's homepage URL."
+# )
 
 generate = st.button(
     "🚀 Generate Brochure",
