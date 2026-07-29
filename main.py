@@ -13,10 +13,10 @@ api_key = os.getenv("GEMMINI_API_KEY")
 # MODEL = "qwen2.5:0.5b"
 MODEL = "gemini-3.6-flash"
 
-if api_key and api_key.startswith("sk-proj-") and len(api_key) > 10:
-    print("API key looks good so far")
+if api_key :
+    print("API key loaded successfully")
 else:
-    print("There might be a problem with your API key? Please visit the troubleshooting notebook!")
+    print("API key not found ")
 
 
 openai = OpenAI(base_url=GOOGLE_BASE_URL, api_key=api_key)

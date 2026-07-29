@@ -63,7 +63,7 @@ if generate:
 
     try:
 
-        with st.spinner("Analyzing website..."):
+        with st.spinner(" AI is analyzing the company website.."):
 
             brochure = create_brochure(
                 company_name,
