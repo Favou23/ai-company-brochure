@@ -8,15 +8,18 @@ from openai import OpenAI
 # Initialize and constants
 load_dotenv()
 OLLAMA_BASE_URL = "http://localhost:11434/v1"
-api_key = os.getenv("OLLAMA_API_KEY")
+GOOGLE_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/openai/"
+api_key = os.getenv("GEMMINI_API_KEY")
+# MODEL = "qwen2.5:0.5b"
+MODEL = "gemini-3.6-flash"
 
 if api_key and api_key.startswith("sk-proj-") and len(api_key) > 10:
     print("API key looks good so far")
 else:
     print("There might be a problem with your API key? Please visit the troubleshooting notebook!")
 
-MODEL = "qwen2.5:0.5b"
-openai = OpenAI(base_url=OLLAMA_BASE_URL, api_key=api_key)
+
+openai = OpenAI(base_url=GOOGLE_BASE_URL, api_key=api_key)
 
 link_system_prompt = """You are an expert website analyst. Your task is to identify the pages that are most useful for creating a company brochure."""
 
@@ -39,8 +42,23 @@ Return only a JSON object with this structure:
 {{"links": [{{"type": "about page", "url": "https://example.com/about"}}]}}"""
     return user_prompt[:5_000]
 
+# def select_relevant_links(url, company_name="the company"):
+#     print(f"Selecting relevant links for {url} by calling {MODEL}")
+#     response = openai.chat.completions.create(
+#         model=MODEL,
+#         messages=[
+#             {"role": "system", "content": link_system_prompt},
+#             {"role": "user", "content": get_links_user_prompt(company_name, url)},
+#         ],
+#         response_format={"type": "json_object"},
+#     )
+#     result = response.choices[0].message.content
+#     links = json.loads(result)
+#     print(f"Found {len(links.get('links', []))} relevant links")
+#     return links
+
+
 def select_relevant_links(url, company_name="the company"):
-    print(f"Selecting relevant links for {url} by calling {MODEL}")
     response = openai.chat.completions.create(
         model=MODEL,
         messages=[
@@ -49,9 +67,10 @@ def select_relevant_links(url, company_name="the company"):
         ],
         response_format={"type": "json_object"},
     )
+
     result = response.choices[0].message.content
     links = json.loads(result)
-    print(f"Found {len(links.get('links', []))} relevant links")
+
     return links
 
 def fetch_page_and_all_relevant_links(url, company_name="the company"):
@@ -87,21 +106,48 @@ use this information to build a short brochure of the company in markdown withou
     user_prompt = user_prompt[:5_000]
     return user_prompt
 
+# def create_brochure(company_name, url):
+#     response = openai.chat.completions.create(
+#         model=MODEL,
+#         messages=[
+#             {"role": "system", "content": brochure_system_prompt},
+#             {"role": "user", "content": get_brochure_user_prompt(company_name, url)},
+#         ],
+#     )
+#     result = response.choices[0].message.content
+
+#     with open("brochure.md", "w", encoding="utf-8") as f:
+#         f.write(result)
+
+#     print("Saved brochure to brochure.md")
+#     print(result)
+
 def create_brochure(company_name, url):
-    response = openai.chat.completions.create(
-        model=MODEL,
-        messages=[
-            {"role": "system", "content": brochure_system_prompt},
-            {"role": "user", "content": get_brochure_user_prompt(company_name, url)},
-        ],
-    )
-    result = response.choices[0].message.content
+    """
+    Generates a professional company brochure.
 
-    with open("brochure.md", "w", encoding="utf-8") as f:
-        f.write(result)
+    Returns:
+        str: Markdown brochure.
+    """
 
-    print("Saved brochure to brochure.md")
-    print(result)
+    try:
+        response = openai.chat.completions.create(
+            model=MODEL,
+            messages=[
+                {"role": "system", "content": brochure_system_prompt},
+                {"role": "user", "content": get_brochure_user_prompt(company_name, url)},
+            ],
+        )
+
+        result = response.choices[0].message.content
+
+        # with open("brochure.md", "w", encoding="utf-8") as f:
+        #     f.write(result)
+
+        return result
+
+    except Exception as e:
+        raise Exception(f"Failed to generate brochure: {e}")
 
 def stream_brochure(company_name, url):
     stream = openai.chat.completions.create(
